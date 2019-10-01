@@ -29,7 +29,7 @@ if ($shareCoinService -ne $null)
 }
 
 # download package
-Invoke-WebRequest -Uri https://github.com/cashsharecoin/sharecoin/archive/sharecoin_0.1.0.zip -OutFile $downloadedPackagePath
+Invoke-WebRequest -Uri https://github.com/CashShareCoin/ShareCoin/releases/download/v0.1.1/sharecoin_0.1.1.zip -OutFile $downloadedPackagePath
 
 # extract package
 7z x $downloadedPackagePath -oc:\sharecoin -y
