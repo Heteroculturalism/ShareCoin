@@ -5,7 +5,7 @@
 #chocolatey will start service
 
 $shareCoinService = get-service sharecoin -ErrorAction SilentlyContinue;
-$shareCoinPackageName = "sharecoin_1.0.0.zip";
+$shareCoinPackageName = "sharecoin_0.1.0.zip";
 $currentDirectory = $(split-path -parent $MyInvocation.MyCommand.Path);
 $downloadedPackagePath = $(join-path $currentDirectory $shareCoinPackageName);
 
@@ -29,7 +29,7 @@ if ($shareCoinService -ne $null)
 }
 
 # download package
-copy-item c:\scratch\sharecoin_release\$shareCoinPackageName -destination $downloadedPackagePath
+Invoke-WebRequest -Uri https://github.com/cashsharecoin/sharecoin/archive/sharecoin_0.1.0.zip -OutFile $downloadedPackagePath
 
 # extract package
 7z x $downloadedPackagePath -oc:\sharecoin -y
