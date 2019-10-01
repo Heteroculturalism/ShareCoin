@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{C6402C8B-9E0E-411D-B4F4-F0400FBDCE84}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShareCoin", "ShareCoin\ShareCoin.csproj", "{E78F01B6-342E-4528-B858-43128B29A764}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Updater", "Updater\Updater.csproj", "{07843291-7418-412F-A0E5-385E067D34F4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C6402C8B-9E0E-411D-B4F4-F0400FBDCE84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6402C8B-9E0E-411D-B4F4-F0400FBDCE84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6402C8B-9E0E-411D-B4F4-F0400FBDCE84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6402C8B-9E0E-411D-B4F4-F0400FBDCE84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E78F01B6-342E-4528-B858-43128B29A764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E78F01B6-342E-4528-B858-43128B29A764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E78F01B6-342E-4528-B858-43128B29A764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E78F01B6-342E-4528-B858-43128B29A764}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07843291-7418-412F-A0E5-385E067D34F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07843291-7418-412F-A0E5-385E067D34F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07843291-7418-412F-A0E5-385E067D34F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07843291-7418-412F-A0E5-385E067D34F4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4B90B703-1A78-4A38-8EF4-E28A7C86720D}
+	EndGlobalSection
+EndGlobal
