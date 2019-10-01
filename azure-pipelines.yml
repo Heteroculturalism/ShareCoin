@@ -13,9 +13,9 @@ steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
-- task: DotNetCoreCLI@2
+- task: DotNetCoreCLI@3
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: 'updater\\updater.csproj'
+    projects: './/updater//updater.csproj'
     arguments: '-c Release'
