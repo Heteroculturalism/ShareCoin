@@ -7,7 +7,6 @@
 $shareCoinService = get-service sharecoin -ErrorAction SilentlyContinue;
 $shareCoinPackageName = "sharecoin_0.1.0.zip";
 $currentDirectory = $(split-path -parent $MyInvocation.MyCommand.Path);
-$downloadedPackagePath = $(join-path $currentDirectory $shareCoinPackageName);
 
 function WaitUntilServices($searchString, $status)
 {
@@ -21,18 +20,8 @@ function WaitUntilServices($searchString, $status)
     }
 }
 
-# stop service
-if ($shareCoinService -ne $null)
-{
-	stop-service -name sharecoin
-	$shareCoinService.WaitForStatus('Stopped','00:00:10')
-}
-
-# download package
-Invoke-WebRequest -Uri https://github.com/CashShareCoin/ShareCoin/releases/download/v0.1.0/sharecoin_0.1.0.zip -OutFile $downloadedPackagePath
-
-# extract package
-7z x $downloadedPackagePath -oc:\sharecoin -y
+# download & install package
+Install-ChocolateyZipPackage -packagename ShareCoin -unziplocation c:\sharecoin -Url 'https://github.com/CashShareCoin/ShareCoin/releases/download/v0.1.0/sharecoin_0.1.0.zip' -checksum '626bbcccfd53b854c52c7cb4ab74b1a071e7f691d1c97d98e1b37c5c748884a4' -checksumtype 'sha256'
 
 # create service, if needed
 if ($shareCoinService -eq $null)

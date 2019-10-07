@@ -46,7 +46,7 @@ namespace WebsiteStatus
                     _logger.LogInformation(await proc.StandardOutput.ReadToEndAsync());
                 }
 
-                await Task.Delay(60000, stoppingToken);
+                await Task.Delay(60 * 60 * 1000, stoppingToken);
             }
         }
     }
