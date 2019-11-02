@@ -6,12 +6,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
-using ILogger = Serilog.ILogger;
 
-namespace WebsiteStatus
+namespace ShareCash
 {
     public class Program
     {
@@ -21,12 +19,12 @@ namespace WebsiteStatus
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.File($@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\ShareCoinLog.txt")
+                .WriteTo.File($@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\ShareCashLog.txt")
                 .CreateLogger();
 
             try
             {
-                Log.Information("Starting up the service");
+                Log.Information("Starting up the service - 5");
                 CreateHostBuilder(args).Build().Run();
                 return;
             }

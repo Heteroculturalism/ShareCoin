@@ -5,9 +5,21 @@ VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{C6402C8B-9E0E-411D-B4F4-F0400FBDCE84}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShareCoin", "ShareCoin\ShareCoin.csproj", "{E78F01B6-342E-4528-B858-43128B29A764}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShareCash", "ShareCash\ShareCash.csproj", "{64D9F092-B3F4-4500-BAA3-4EC9F7FBF116}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Updater", "Updater\Updater.csproj", "{07843291-7418-412F-A0E5-385E067D34F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Installer", "Installer\Installer.csproj", "{7D1ED37F-6A27-4F45-AC2A-2006130C347B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{C283756E-EDDA-4B9A-A666-3A0742673142}"
+	ProjectSection(SolutionItems) = preProject
+		createDependencyPackages.ps1 = createDependencyPackages.ps1
+		createInstaller.ps1 = createInstaller.ps1
+		createShareCashPackage.ps1 = createShareCashPackage.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{7672B669-E609-46DC-9382-8DEB73E96C7D}"
+	ProjectSection(SolutionItems) = preProject
+		testPackage.ps1 = testPackage.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +31,14 @@ Global
 		{C6402C8B-9E0E-411D-B4F4-F0400FBDCE84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6402C8B-9E0E-411D-B4F4-F0400FBDCE84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6402C8B-9E0E-411D-B4F4-F0400FBDCE84}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E78F01B6-342E-4528-B858-43128B29A764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E78F01B6-342E-4528-B858-43128B29A764}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E78F01B6-342E-4528-B858-43128B29A764}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E78F01B6-342E-4528-B858-43128B29A764}.Release|Any CPU.Build.0 = Release|Any CPU
-		{07843291-7418-412F-A0E5-385E067D34F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{07843291-7418-412F-A0E5-385E067D34F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{07843291-7418-412F-A0E5-385E067D34F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{07843291-7418-412F-A0E5-385E067D34F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64D9F092-B3F4-4500-BAA3-4EC9F7FBF116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64D9F092-B3F4-4500-BAA3-4EC9F7FBF116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64D9F092-B3F4-4500-BAA3-4EC9F7FBF116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64D9F092-B3F4-4500-BAA3-4EC9F7FBF116}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D1ED37F-6A27-4F45-AC2A-2006130C347B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D1ED37F-6A27-4F45-AC2A-2006130C347B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D1ED37F-6A27-4F45-AC2A-2006130C347B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D1ED37F-6A27-4F45-AC2A-2006130C347B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ShareCoin {
+namespace ShareCash {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ShareCoin {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ShareCoin.Resource1", typeof(Resource1).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ShareCash.Resource1", typeof(Resource1).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,29 +61,23 @@ namespace ShareCoin {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to # =====================================================================
-        ///# Copyright 2017 - Present Chocolatey Software, Inc, and the
-        ///# original authors/contributors from ChocolateyGallery
-        ///# Copyright 2011 - 2017 RealDimensions Software, LLC, and the
-        ///# original authors/contributors from ChocolateyGallery
-        ///# at https://github.com/chocolatey/chocolatey.org
-        ///#
-        ///# Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
-        ///# you may not use this file except in compliance with the License.
-        ///# You may obt [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to plot_dirs:
+        ///   - &apos;test_data&apos;
+        ///
+        ///url: &apos;http://100-0-pool.burst.cryptoguru.org:8124&apos;  # cryptoguru 50-50 pool
+        ///
+        ///hdd_reader_thread_count: 0            # default 0 (=auto: number of disks)
+        ///hdd_use_direct_io: true               # default true
+        ///hdd_wakeup_after: 240                 # default 240s
+        ///
+        ///cpu_threads: 0                        # default 0 (=auto: number of logical cpu cores)
+        ///cpu_worker_task_count: 4              # default 4 (0=GPU only)
+        ///cpu_nonces_per_cache: 65536           # default 65536
+        ///cpu_thre [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string install {
+        internal static string config_base {
             get {
-                return ResourceManager.GetString("install", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to @&quot;%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -InputFormat None -ExecutionPolicy Bypass ./install.ps1 &amp;&amp; SET &quot;PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin&quot;.
-        /// </summary>
-        internal static string installChocolatey {
-            get {
-                return ResourceManager.GetString("installChocolatey", resourceCulture);
+                return ResourceManager.GetString("config_base", resourceCulture);
             }
         }
     }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ConsoleApp1
@@ -11,6 +12,13 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
+            var bar = new CancellationTokenSource();
+
+            bar.Token.Register(() => Console.WriteLine("canceled"));
+
+            bar.Cancel();
+            bar.Cancel();
+
             chocolatey.GetChocolatey x = new chocolatey.GetChocolatey();
 
             var listCommand = new chocolatey.infrastructure.app.configuration.ListCommandConfiguration();

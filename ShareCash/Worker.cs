@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
+using System.Reflection;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using chocolatey.infrastructure.results;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NuGet;
 
-namespace WebsiteStatus
+namespace ShareCash
 {
     public class Worker : BackgroundService
     {
@@ -20,30 +23,40 @@ namespace WebsiteStatus
             _logger = logger;
         }
 
-        public override Task StopAsync(CancellationToken cancellationToken)
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("The service has been stopped...");
-            return base.StopAsync(cancellationToken);
+            ShareCash.SetLogger(_logger);
+
+            _ = MonitorForAppUpdateAsync(stoppingToken);
+
+           return ShareCash.RunAsync(stoppingToken);
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        private async Task MonitorForAppUpdateAsync(CancellationToken stoppingToken)
         {
+            // check for new version
             while (!stoppingToken.IsCancellationRequested)
             {
-                var proc = new Process
+                using var proc = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = $@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\chocolatey\choco.exe",
-                        Arguments = "upgrade -y ShareCoin",
+                        Arguments = "upgrade -y ShareCash",
                         RedirectStandardOutput = true,
                         CreateNoWindow = true
                     }
                 };
-
+                
                 if(proc.Start())
                 {
-                    _logger.LogInformation(await proc.StandardOutput.ReadToEndAsync());
+                    string standardOutput;
+                    while ((standardOutput = await proc.StandardOutput.ReadLineAsync()) != null)
+                    {
+                        _logger.LogInformation(standardOutput);
+                    }
+
+                    await Task.Run(() => proc.Start(), stoppingToken);
                 }
 
                 await Task.Delay(60 * 60 * 1000, stoppingToken);
