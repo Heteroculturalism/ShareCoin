@@ -20,11 +20,12 @@ namespace ShareCash
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.File($@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\ShareCashLog.txt")
+                .WriteTo.Console()
                 .CreateLogger();
 
             try
             {
-                Log.Information("Starting up the service - 5");
+                Log.Information("Starting up the service - 6");
                 CreateHostBuilder(args).Build().Run();
                 return;
             }

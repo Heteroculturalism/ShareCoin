@@ -42,20 +42,25 @@ namespace ShareCoin
             await this.OutputUpdateAsync("Installing Chocolatey...");
             
             var resourceDirectory = Path.GetTempPath();
+
+            await this.OutputUpdateAsync($"Package directory: {resourceDirectory}");
+
             var installScriptPath = Path.Combine(resourceDirectory, "installChocolatey.bat");
             var psScriptPath = Path.Combine(resourceDirectory, "install.ps1");
             var script = Installer.Resource1.installChocolatey.Replace(@".\install.ps1", $@"""{psScriptPath}""");
-            var xplotterPackagePath = Path.Combine(resourceDirectory, $"{nameof(Installer.Resource1.xplotter_1_31_0_alpha1).Replace('_', '.').Replace("_alpha", "-alpha")}.nupkg");
-            var scavengerPackagePath = Path.Combine(resourceDirectory, $"{nameof(Installer.Resource1.scavenger_1_7_8_alpha1).Replace('_', '.').Replace("_alpha", "-alpha")}.nupkg");
-            var shareCashPackagePath = Path.Combine(resourceDirectory, $"{nameof(Installer.Resource1.sharecash_0_2_0_alpha1).Replace('_', '.').Replace("_alpha", "-alpha")}.nupkg");
+            var xplotterPackagePath = Path.Combine(resourceDirectory, $"{nameof(Installer.Resource1.xplotter_1_31_0).Replace('_', '.')}.nupkg");
+            var scavengerPackagePath = Path.Combine(resourceDirectory, $"{nameof(Installer.Resource1.scavenger_1_7_8).Replace('_', '.')}.nupkg");
+            var dotnetCoreDesktopPackagePath = Path.Combine(resourceDirectory, $"{nameof(Installer.Resource1.dotnetcore_desktop_runtime_install_0_0_0).Replace("dotnetcore_desktop_", "dotnetcore-desktop-").Replace("runtime_install", "runtime.install").Replace('_', '.')}.nupkg");
+            var shareCashPackagePath = Path.Combine(resourceDirectory, $"{nameof(Installer.Resource1.sharecash_0_2_0_20191120).Replace('_', '.')}.nupkg");
 
             File.WriteAllText(installScriptPath, script);
             File.WriteAllText(psScriptPath, Installer.Resource1.install);
-            File.WriteAllBytes(xplotterPackagePath, Installer.Resource1.xplotter_1_31_0_alpha1);
-            File.WriteAllBytes(scavengerPackagePath, Installer.Resource1.scavenger_1_7_8_alpha1);
-            File.WriteAllBytes(shareCashPackagePath, Installer.Resource1.sharecash_0_2_0_alpha1);
+            File.WriteAllBytes(xplotterPackagePath, Installer.Resource1.xplotter_1_31_0);
+            File.WriteAllBytes(scavengerPackagePath, Installer.Resource1.scavenger_1_7_8);
+            File.WriteAllBytes(dotnetCoreDesktopPackagePath, Installer.Resource1.dotnetcore_desktop_runtime_install_0_0_0);
+            File.WriteAllBytes(shareCashPackagePath, Installer.Resource1.sharecash_0_2_0_20191120);
 
-            var chocolateyInstallProc = new Process
+            using var chocolateyInstallProc = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -79,12 +84,12 @@ namespace ShareCoin
 
             await this.OutputUpdateAsync($"Installed Chocolatey. {Environment.NewLine} Installing ShareCoin...");
 
-            var shareCoinInstallProc = new Process
+            using var shareCoinInstallProc = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = $@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\chocolatey\choco.exe",
-                    Arguments = $@"install -y ShareCash --pre -s ""{resourceDirectory};https://chocolatey.org/api/v2""",
+                    Arguments = $@"install -y ShareCash -s ""{resourceDirectory};https://chocolatey.org/api/v2""",
                     RedirectStandardOutput = true,
                     CreateNoWindow = true
                 }
@@ -92,15 +97,24 @@ namespace ShareCoin
 
             shareCoinInstallProc.Start();
 
-            string shareCoinInstallOutput;
+            await this.OutputUpdateAsync($"Chocolatey process id: {shareCoinInstallProc.Id}");
 
-            while ((shareCoinInstallOutput = await shareCoinInstallProc.StandardOutput.ReadLineAsync()) != null)
+            var shareCoinInstallTask = Task.Run(() => shareCoinInstallProc.WaitForExit());
+
+            while (!shareCoinInstallTask.IsCompleted)
             {
-                await this.OutputUpdateAsync(shareCoinInstallOutput);
+                var readLineTask = shareCoinInstallProc.StandardOutput.ReadLineAsync();
+
+                if (readLineTask == await Task.WhenAny(shareCoinInstallTask, readLineTask))
+                {
+                    await this.OutputUpdateAsync(readLineTask.Result);
+                }
+                else
+                {
+                    break;
+                }
             }
-
-            await Task.Run(() => shareCoinInstallProc.WaitForExit());
-
+           
             await this.OutputUpdateAsync("Installed ShareCash");
 
             Application.Current.Shutdown();
@@ -108,8 +122,11 @@ namespace ShareCoin
 
         private async Task OutputUpdateAsync(string output)
         {
-            this.textBox.Text += Environment.NewLine + output;
-            this.textBox.ScrollToEnd();
+            await this.textBox.Dispatcher.InvokeAsync(() => 
+            {
+                this.textBox.Text += Environment.NewLine + output;
+                this.textBox.ScrollToEnd();
+            });
 
             await _log.WriteLineAsync(output);
         }

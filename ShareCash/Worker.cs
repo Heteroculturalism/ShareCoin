@@ -25,11 +25,25 @@ namespace ShareCash
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            ShareCash.SetLogger(_logger);
+            App.SetLogger(_logger);
 
             _ = MonitorForAppUpdateAsync(stoppingToken);
 
-           return ShareCash.RunAsync(stoppingToken);
+            _ = Task.Run(() => {
+                while (true)
+                {
+                    if (Console.ReadLine() == "exit")
+                    {
+                        _ = this.StopAsync(CancellationToken.None);
+
+                        break;
+                    }
+                }
+            });
+
+            App.Run(stoppingToken);
+
+            return Task.CompletedTask;
         }
 
         private async Task MonitorForAppUpdateAsync(CancellationToken stoppingToken)

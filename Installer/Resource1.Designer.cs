@@ -61,6 +61,16 @@ namespace Installer {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] dotnetcore_desktop_runtime_install_0_0_0 {
+            get {
+                object obj = ResourceManager.GetObject("dotnetcore_desktop_runtime_install_0_0_0", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to # =====================================================================
         ///# Copyright 2017 - Present Chocolatey Software, Inc, and the
         ///# original authors/contributors from ChocolateyGallery
@@ -90,9 +100,9 @@ namespace Installer {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] scavenger_1_7_8_alpha1 {
+        internal static byte[] scavenger_1_7_8 {
             get {
-                object obj = ResourceManager.GetObject("scavenger_1_7_8_alpha1", resourceCulture);
+                object obj = ResourceManager.GetObject("scavenger_1_7_8", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -100,9 +110,9 @@ namespace Installer {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] sharecash_0_2_0_alpha1 {
+        internal static byte[] sharecash_0_2_0_20191120 {
             get {
-                object obj = ResourceManager.GetObject("sharecash_0_2_0_alpha1", resourceCulture);
+                object obj = ResourceManager.GetObject("sharecash_0_2_0_20191120", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -110,9 +120,9 @@ namespace Installer {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] xplotter_1_31_0_alpha1 {
+        internal static byte[] xplotter_1_31_0 {
             get {
-                object obj = ResourceManager.GetObject("xplotter_1_31_0_alpha1", resourceCulture);
+                object obj = ResourceManager.GetObject("xplotter_1_31_0", resourceCulture);
                 return ((byte[])(obj));
             }
         }
