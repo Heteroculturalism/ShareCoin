@@ -18,6 +18,7 @@ using YamlDotNet.Serialization;
 using ShareCash.Core;
 using System.IO.Pipes;
 using System.IO.MemoryMappedFiles;
+using System.Runtime.Intrinsics.X86;
 
 namespace ShareCash
 {
@@ -581,7 +582,7 @@ namespace ShareCash
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = $@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\chocolatey\lib\xplotter\xplotter_avx.exe",
+                    FileName = $@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\chocolatey\lib\xplotter\{GetXplotterApp()}",
                     Arguments = args,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true
@@ -607,6 +608,8 @@ namespace ShareCash
                 await Task.Run(() => proc.WaitForExit(), stopPlottingToken);
             }
         }
+
+        private static string GetXplotterApp() => Avx2.IsSupported ? "XPlotter_avx2.exe" : Avx.IsSupported ? "XPlotter_avx.exe" : "XPlotter_sse.exe";
 
         private static long GetRandomStartingNonce() => new Random().Next(0, (int) (TargetPoolCapacity / AverageIndividualCapacity));
 

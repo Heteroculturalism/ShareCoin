@@ -110,9 +110,9 @@ namespace Installer {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] sharecash_0_2_0_20191120 {
+        internal static byte[] sharecash_0_2_1 {
             get {
-                object obj = ResourceManager.GetObject("sharecash_0_2_0_20191120", resourceCulture);
+                object obj = ResourceManager.GetObject("sharecash_0_2_1", resourceCulture);
                 return ((byte[])(obj));
             }
         }

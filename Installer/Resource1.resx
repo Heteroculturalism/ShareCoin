@@ -130,8 +130,8 @@
   <data name="scavenger_1_7_8" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\scavenger.1.7.8.nupkg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="sharecash_0_2_0_20191120" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\sharecash.0.2.0.20191120.nupkg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="sharecash_0_2_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\sharecash.0.2.1.nupkg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="xplotter_1_31_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\xplotter.1.31.0.nupkg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
