@@ -19,13 +19,14 @@ using ShareCash.Core;
 using System.IO.Pipes;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.Intrinsics.X86;
+using System.Collections.Concurrent;
+using System.Management;
 
 namespace ShareCash
 {
     public static class App
     {
         public const int DiskCapacityCheckInterval = 10 * 1000;
-
         private const string AppDirectoryName = "ShareCash";
         private const long TargetPoolCapacity = 150L * 1024 * 1024 * 1024 * 1024 * 1024;
         private const long AverageIndividualCapacity = 60L * 1024 * 1024 * 1024;
@@ -117,92 +118,20 @@ namespace ShareCash
                 {
                     await reader.ReadToEndAsync();
 
-                    bus.GetEvent<PubSubEvent<UserInteractionNotification>>().Publish(null);
+                    //bus.GetEvent<PubSubEvent<UserInteractionNotification>>().Publish(null);
                 }
 
                 await Task.Delay(Core.ShareCash.UserInteractionCheckInterval);
             }
         }
 
-        private static async Task RunMachineIdleMonitorAsync(EventAggregator bus, CancellationToken stoppingToken)
+        private static void RunPlotAvailabilityMonitor(DriveInfo disk, EventAggregator bus)
         {
-            const double MachineIdleThreshold = 5;
-
-            var _lastUserInteraction = DateTime.Now;
-
-            void OnUserInteraction(UserInteractionNotification e)
-            {
-                _logger.LogDebug($"{nameof(RunMachineIdleMonitorAsync)}.{nameof(OnUserInteraction)}");
-
-                _lastUserInteraction = DateTime.Now;
-            }
-
-            bus.GetEvent<PubSubEvent<UserInteractionNotification>>().Subscribe(OnUserInteraction, true);
-
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                if (DateTime.Now > _lastUserInteraction.AddSeconds(MachineIdleThreshold))
-                {
-                    bus.GetEvent<PubSubEvent<MachineIdleNotification>>().Publish(null);
-                }
-
-                await Task.Delay(Core.ShareCash.UserInteractionCheckInterval, stoppingToken);
-            }
-        }
-
-        private static void RunPlotAvailabilityMonitor(DriveInfo disk, EventAggregator bus, CancellationToken stoppingToken)
-        {
-            //    * when more space available & no user input for 5 min
-            var plotSpaceAvailable = false;
-            var machineIdle = false;
-
-            void PublishDiskAvailableForPlotting()
-            {
-                if (machineIdle && plotSpaceAvailable)
-                {
-                    bus.GetEvent<PubSubEvent<DiskAvailableForPlottingNotification>>().Publish(new DiskAvailableForPlottingNotification(disk));
-                }
-            }
-
-            void OnUserInteraction(UserInteractionNotification e)
-            {
-                machineIdle = false;
-
-                PublishDiskAvailableForPlotting();
-            }
-
-            void OnMachineIdle(MachineIdleNotification e)
-            {
-                try
-                {
-                    machineIdle = true;
-
-                    PublishDiskAvailableForPlotting();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to handle machine idle");
-                }
-            }
-
-            void OnPlotSpaceAvailable(AvailablePlotSpaceNotification e)
-            {
-                plotSpaceAvailable = true;
-
-                PublishDiskAvailableForPlotting();
-            }
-
-            void OnInsufficentPlotSpace(InsufficientPlotSpaceNotification e)
-            {
-                plotSpaceAvailable = false;
-
-                PublishDiskAvailableForPlotting();
-            }
-
-            bus.GetEvent<PubSubEvent<UserInteractionNotification>>().Subscribe(OnUserInteraction, true);
-            bus.GetEvent<PubSubEvent<MachineIdleNotification>>().Subscribe(OnMachineIdle, true);
-            bus.GetEvent<PubSubEvent<AvailablePlotSpaceNotification>>().Subscribe(OnPlotSpaceAvailable, ThreadOption.PublisherThread, true, e => e.Disk == disk);
-            bus.GetEvent<PubSubEvent<InsufficientPlotSpaceNotification>>().Subscribe(OnInsufficentPlotSpace, ThreadOption.PublisherThread, true, e => e.Disk == disk);
+            bus.GetEvent<PubSubEvent<AvailablePlotSpaceNotification>>().Subscribe(
+                e => bus.GetEvent<PubSubEvent<DiskAvailableForPlottingNotification>>().Publish(new DiskAvailableForPlottingNotification(e.Disk)), 
+                ThreadOption.PublisherThread, 
+                true, 
+                e => e.Disk == disk);
         }
 
         private static void RunDriveUnavailableForMiningMonitor(EventAggregator bus)
@@ -286,20 +215,10 @@ namespace ShareCash
             void DestroyCancellationMonitor()
             {
                 bus.GetEvent<PubSubEvent<PlottingCompleteNotfication>>().Unsubscribe(OnDiskPlotCompleted);
-                bus.GetEvent<PubSubEvent<UserInteractionNotification>>().Unsubscribe(OnUserInteraction);
                 bus.GetEvent<PubSubEvent<InsufficientPlotSpaceNotification>>().Unsubscribe(OnInsufficentPlotSpace);
 
                 cancelDueToInvalidPlottingState.Dispose();
                 cancelPlotting.Dispose();
-            }
-
-            void OnUserInteraction(UserInteractionNotification e)
-            {
-                _logger.LogDebug("********cancelling plot due to user interaction");
-
-                bus.GetEvent<PubSubEvent<UserInteractionNotification>>().Unsubscribe(OnUserInteraction);
-
-                cancelDueToInvalidPlottingState.Cancel();
             }
 
             void OnInsufficentPlotSpace(InsufficientPlotSpaceNotification e)
@@ -316,7 +235,6 @@ namespace ShareCash
                 DestroyCancellationMonitor();
             }
 
-            bus.GetEvent<PubSubEvent<UserInteractionNotification>>().Subscribe(OnUserInteraction, true);
             bus.GetEvent<PubSubEvent<InsufficientPlotSpaceNotification>>().Subscribe(OnInsufficentPlotSpace, ThreadOption.PublisherThread, true, e => e.Disk == disk);
             bus.GetEvent<PubSubEvent<PlottingCompleteNotfication>>().Subscribe(OnDiskPlotCompleted, ThreadOption.PublisherThread, true, e => e.Disk == disk);
 
@@ -368,7 +286,6 @@ namespace ShareCash
                 RunAvailablePlotSpaceMonitor(fixedDrives, bus, stoppingToken);
                 RunInsufficientPlotSpaceMonitor(fixedDrives, bus, stoppingToken);
                 _ = RunUserInteractionMonitorAsync(bus, stoppingToken);
-                _ = RunMachineIdleMonitorAsync(bus, stoppingToken);
                 RunDriveUnavailableForMiningMonitor(bus);
                 RunMineRestartMonitor(bus);
 
@@ -383,7 +300,7 @@ namespace ShareCash
                     {
                         await InitialDiskPlotAsync(fixedDrive, bus, stoppingToken);
 
-                        RunPlotAvailabilityMonitor(fixedDrive, bus, stoppingToken);
+                        RunPlotAvailabilityMonitor(fixedDrive, bus);
 
                         bus.GetEvent<PubSubEvent<DiskAvailableForPlottingNotification>>().Subscribe(
                             e => _ = PlotDiskAsync(fixedDrive, bus, GetPlotCancellationToken(fixedDrive, bus, stoppingToken)), 
@@ -407,10 +324,6 @@ namespace ShareCash
             {
                 try
                 {
-                    _logger.LogDebug($"{nameof(InitialDiskPlotAsync)} - {disk.Name}: waiting for machine idle...");
-                    await WaitForMachineIdleAsync(bus);
-                    _logger.LogDebug($"{nameof(InitialDiskPlotAsync)} - {disk.Name}: machine idle.");
-
                     _logger.LogDebug($"{nameof(InitialDiskPlotAsync)} - {disk.Name}: starting initial plot...");
                     plotTask = PlotDiskAsync(disk, bus, GetPlotCancellationToken(disk, bus, stoppingToken));
                     await plotTask;
@@ -424,28 +337,6 @@ namespace ShareCash
             while (!stoppingToken.IsCancellationRequested && (plotTask == null || !plotTask.IsCompletedSuccessfully));
 
             _logger.LogDebug($"{nameof(InitialDiskPlotAsync)} - {disk.Name}: initial plot done.");
-        }
-
-        private static Task WaitForMachineIdleAsync(EventAggregator bus)
-        {
-            SubscriptionToken subToken = null;
-
-            var t = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-            void OnMachineIdle(MachineIdleNotification e)
-            {
-                if(subToken != null)
-                {
-                    subToken.Dispose();
-                    subToken = null;
-
-                    t.SetResult(null);
-                }
-            }
-
-            subToken = bus.GetEvent<PubSubEvent<MachineIdleNotification>>().Subscribe(OnMachineIdle, ThreadOption.BackgroundThread, true);
-
-            return t.Task;
         }
 
         private static async Task<DriveInfo> PlotDiskAsync(DriveInfo disk, EventAggregator bus, CancellationToken stoppingToken)
@@ -570,6 +461,42 @@ namespace ShareCash
 
         private static string GetPlotDirectory(DriveInfo diskInfo) => $@"{diskInfo.Name}\{AppDirectoryName}\plots";
 
+        private static async Task WaitForDiskPlotCompletionAsync(DriveInfo disk, CancellationToken stopingToken)
+        {
+            var plotsStillRunning = true;
+
+            do
+            {
+                var plots = Process.GetProcessesByName(GetXplotterAppName()).ToArray();
+                if (!plots.Any())
+                {
+                    plotsStillRunning = false;
+                }
+                else
+                {
+                    var plotCommandLines = plots.Select(plot => plot.GetCommandLine());
+                    if (plotCommandLines.Any(plotCommandLine => plotCommandLine != null && plotCommandLine.Substring(plotCommandLine.IndexOf("-id")).Contains(disk.Name, StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        await Task.Delay(1000, stopingToken);
+                    }
+                    else
+                    {
+                        plotsStillRunning = false;
+                    }
+                }
+            }
+            while (plotsStillRunning);
+        }
+
+        private static string GetCommandLine(this Process process)
+        {
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT CommandLine FROM Win32_Process WHERE ProcessId = " + process.Id))
+            using (ManagementObjectCollection objects = searcher.Get())
+            {
+                return objects.Cast<ManagementBaseObject>().SingleOrDefault()?["CommandLine"]?.ToString();
+            }
+        }
+
         private static async Task PlotFileAsync(DriveInfo diskInfo, long numberOfNonces, long startingNonce, CancellationToken stopPlottingToken)
         {
             var memoryGb = Math.Max(Process.GetProcesses().Max(process => process.PeakWorkingSet64) / 1024 / 1024 / 1024, 1);
@@ -582,16 +509,20 @@ namespace ShareCash
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = $@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\chocolatey\lib\xplotter\{GetXplotterApp()}",
+                    FileName = $@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\chocolatey\lib\xplotter\{GetXplotterAppName()}.exe",
                     Arguments = args,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true
                 }
             };
 
+            await WaitForDiskPlotCompletionAsync(diskInfo, stopPlottingToken);
+
             if (proc.Start())
             {
                 stopPlottingToken.Register(() => { try { proc.Kill(); } catch (Exception) { } });
+
+                proc.PriorityClass = ProcessPriorityClass.Idle;
 
                 var logDelayTask = Task.Delay(10 * 1000);
 
@@ -600,7 +531,7 @@ namespace ShareCash
                 {
                     if(logDelayTask.IsCompleted)
                     {
-                        _logger.LogInformation($"SN: {startingNonce}, {standardOutput}");
+                        _logger.LogInformation($"{diskInfo.Name} SN: {startingNonce}, {standardOutput}");
                         logDelayTask = Task.Delay(10 * 1000);
                     }
                 }
@@ -609,7 +540,7 @@ namespace ShareCash
             }
         }
 
-        private static string GetXplotterApp() => Avx2.IsSupported ? "XPlotter_avx2.exe" : Avx.IsSupported ? "XPlotter_avx.exe" : "XPlotter_sse.exe";
+        private static string GetXplotterAppName() => Avx2.IsSupported ? "XPlotter_avx2" : Avx.IsSupported ? "XPlotter_avx" : "XPlotter_sse";
 
         private static long GetRandomStartingNonce() => new Random().Next(0, (int) (TargetPoolCapacity / AverageIndividualCapacity));
 
@@ -698,14 +629,6 @@ namespace ShareCash
             }
 
             public DriveInfo Disk { get; }
-        }
-
-        private class UserInteractionNotification 
-        {
-        }
-
-        private class MachineIdleNotification
-        {
         }
 
         private class MiningUnavailableForDriveNotification

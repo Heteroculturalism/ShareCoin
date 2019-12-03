@@ -15,15 +15,6 @@ $hash = $(get-filehash -path $packageFolder\tools\sharecash.zip -algorithm sha25
 
 Install-ChocolateyZipPackage -packagename ShareCash -unziplocation c:\ShareCash  -Url $packageFolder\tools\sharecash.zip -checksum $hash -checksumtype 'sha256'
 
-# Create shortcut to user interaction monitor
-$WshShell = New-Object -comObject WScript.Shell
-$Shortcut = $WshShell.CreateShortcut("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\Gui.lnk")
-$Shortcut.TargetPath = "C:\sharecash\gui.exe"
-$Shortcut.Save()
-
-# Run user interaction monitor
-C:\sharecash\gui.exe
-
 # Create & start ShareCash service
 new-service -name ShareCash -BinaryPathName "C:\ShareCash\ShareCash.exe"
 start-service ShareCash
