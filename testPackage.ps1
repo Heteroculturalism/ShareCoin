@@ -1,3 +1,4 @@
+# test 1
 $origDir = $pwd
 
 & "$PSScriptRoot\createShareCashPackage.ps1"
